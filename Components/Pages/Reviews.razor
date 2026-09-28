@@ -1,0 +1,605 @@
+@page "/reviews"
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Council Reviews & Ratings - Master Yoga</PageTitle>
+
+<div class="w-full min-h-screen bg-[#29326c] text-white font-sans overflow-x-hidden">
+
+    <!-- SHARED NAVBAR -->
+    <NavBar ActivePage="reviews" />
+
+    <!-- SECTION 1: HERO TITLE BANNER -->
+    <section class="w-full bg-[#4a5cce] px-5 py-3.5 border-t border-b border-[#38438a]/30 select-none md:px-10 md:py-5 lg:px-12 lg:py-[22px]">
+        <h1 class="font-display font-black leading-none tracking-[-0.04em] uppercase m-0 flex flex-wrap items-center gap-[0.25em] text-[40px] md:text-[68px] lg:text-[88px] xl:text-[110px]">
+            <span class="text-white">COUNCIL</span>
+            <span class="text-[#808dfd]">REVIEWS</span>
+        </h1>
+    </section>
+
+    <!-- SECTION 2: RATINGS OVERVIEW & SUBMIT INVITATION -->
+    <section class="w-full flex flex-col border-b border-[#38438a] bg-[#150073] lg:flex-row">
+        <!-- Rating Summary Box -->
+        <div class="p-7 flex flex-col justify-between border-b border-[#38438a] lg:w-[45%] lg:p-12 lg:border-b-0 lg:border-r">
+            <div>
+                <span class="font-black text-[10px] tracking-[0.25em] uppercase text-[#93c5fd] mb-2 block">
+                    HOLOCRON ARCHIVES
+                </span>
+                <h2 class="font-display font-black text-2xl uppercase tracking-tight text-white m-0 mb-4 md:text-[32px]">
+                    COMMUNITY FEEDBACK
+                </h2>
+                <p class="text-[13px] text-blue-100/90 leading-[1.65] font-normal m-0 mb-8 max-w-lg">
+                    Read unvarnished testimonies from Younglings, Padawans, and Jedi Knights who have deepened their connection to the Force through Master Yoga.
+                </p>
+
+                <!-- Big Score Card -->
+                <div class="bg-[#1f2756] border border-[#38438a] rounded-xl p-6 flex flex-col sm:flex-row items-center gap-6">
+                    <div class="text-center sm:text-left shrink-0">
+                        <div class="font-display font-black text-5xl md:text-6xl text-white leading-none">
+                            @AverageRating.ToString("0.0")
+                        </div>
+                        <div class="flex items-center justify-center sm:justify-start gap-1 my-2 text-amber-400 text-lg">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= Math.Round(AverageRating))
+                                {
+                                    <span>★</span>
+                                }
+                                else
+                                {
+                                    <span class="text-blue-900/60">★</span>
+                                }
+                            }
+                        </div>
+                        <div class="text-xs text-blue-200/80 font-medium">
+                            Based on @reviews.Count transmissions
+                        </div>
+                    </div>
+
+                    <!-- Star Distribution -->
+                    <div class="w-full flex flex-col gap-1.5 border-t sm:border-t-0 sm:border-l border-[#38438a] pt-4 sm:pt-0 sm:pl-6">
+                        @for (int star = 5; star >= 1; star--)
+                        {
+                            var count = reviews.Count(r => r.Rating == star);
+                            var pct = reviews.Count > 0 ? (count * 100) / reviews.Count : 0;
+                            <div class="flex items-center gap-2 text-xs">
+                                <span class="w-12 text-blue-200/90 font-bold">@star Stars</span>
+                                <div class="flex-1 h-2 bg-[#0c102b] rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#808dfd] rounded-full transition-all duration-500" style="width: @(pct)%"></div>
+                                </div>
+                                <span class="w-8 text-right text-blue-200/70 font-mono text-[11px]">@count</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex flex-wrap items-center gap-4">
+                <button type="button" @onclick="ScrollToReviewForm" class="font-black text-[11px] tracking-[0.12em] uppercase bg-[#808dfd] text-[#0c102b] py-3 px-6 rounded-md shadow-sm border-none transition-all hover:bg-[#939ffd] active:scale-[0.97] cursor-pointer inline-block text-center">
+                    LEAVE A REVIEW ↓
+                </button>
+                <a href="/reserve" class="font-black text-[11px] tracking-[0.12em] uppercase bg-[#202758] text-[#bfdbfe] py-3 px-6 rounded-md border border-[#38438a]/60 shadow-sm transition-all hover:bg-[#2c367a] hover:text-white active:scale-[0.97] no-underline inline-block text-center">
+                    BOOK A SESSION →
+                </a>
+            </div>
+        </div>
+
+        <!-- Highlight Featured Testimonials -->
+        <div class="p-7 flex flex-col justify-between bg-[#0e1644] lg:w-[55%] lg:p-12">
+            <div>
+                <span class="font-black text-[10px] tracking-[0.25em] uppercase text-[#808dfd] mb-2 block">
+                    FEATURED TRANSMISSION
+                </span>
+                <h3 class="font-display font-black text-2xl uppercase tracking-tight text-white m-0 mb-6 md:text-[28px]">
+                    WORDS OF THE MASTERS
+                </h3>
+
+                <div class="bg-[#19235d] border border-blue-900/60 rounded-xl p-6 relative overflow-hidden">
+                    <div class="text-4xl text-[#808dfd]/30 font-serif absolute top-2 right-4 select-none">“</div>
+                    <div class="flex items-center gap-1 text-amber-400 text-sm mb-3">
+                        <span>★★★★★</span>
+                        <span class="text-xs text-blue-200/70 ml-2 font-mono">Verified Session</span>
+                    </div>
+                    <h4 class="font-display font-bold text-lg text-white m-0 mb-2">
+                        "The Frog Malasana saved my lower back after years of cockpit duty."
+                    </h4>
+                    <p class="text-[13px] text-blue-100/90 leading-relaxed m-0 mb-4">
+                        Master Yoda's cues on hip pelvic stability and grounding were transformative. Even during the longest deep squat hold, the breathing technique made gravity feel weightless.
+                    </p>
+                    <div class="flex items-center justify-between border-t border-blue-900/50 pt-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-full bg-[#808dfd] text-[#0c102b] font-black flex items-center justify-center text-xs">
+                                LS
+                            </span>
+                            <div>
+                                <div class="font-bold text-xs text-white">Luke Skywalker</div>
+                                <div class="text-[10px] text-blue-300 uppercase tracking-wider">Jedi Knight • Dagobah Session</div>
+                            </div>
+                        </div>
+                        <span class="text-[11px] text-blue-300/60 font-mono">Stardate 42.1</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Perks Summary -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-8 pt-6 border-t border-[#38438a]/60">
+                <div>
+                    <div class="font-display font-black text-xl text-white">99%</div>
+                    <div class="text-[11px] text-blue-200/80 uppercase tracking-wide">Force Alignment</div>
+                </div>
+                <div>
+                    <div class="font-display font-black text-xl text-white">100%</div>
+                    <div class="text-[11px] text-blue-200/80 uppercase tracking-wide">Council Verified</div>
+                </div>
+                <div>
+                    <div class="font-display font-black text-xl text-white">5 / 5</div>
+                    <div class="text-[11px] text-blue-200/80 uppercase tracking-wide">Master Instruction</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: REVIEWS LIST WITH FILTERS & REAL-TIME COMMENTS -->
+    <section class="w-full px-5 py-10 md:px-10 md:py-14 lg:px-[60px] lg:py-16 border-b border-[#38438a]">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Filter and Header Bar -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-[#38438a]/60">
+                <div>
+                    <h2 class="font-display font-black text-2xl uppercase tracking-tight text-white m-0 md:text-3xl">
+                        TRANSMISSION LOGS (@FilteredReviews.Count())
+                    </h2>
+                    <p class="text-xs text-blue-200/80 m-0 mt-1">Filtered by your selected Council criteria.</p>
+                </div>
+
+                <!-- Star Filter Buttons -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <button @onclick='() => SetStarFilter(0)'
+                            class="text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-md border transition-colors @(selectedRatingFilter == 0 ? "bg-[#808dfd] text-[#0c102b] border-[#808dfd]" : "bg-[#1f2756] text-blue-200 border-[#38438a] hover:bg-[#29346e]")">
+                        All
+                    </button>
+                    <button @onclick='() => SetStarFilter(5)'
+                            class="text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-md border transition-colors @(selectedRatingFilter == 5 ? "bg-[#808dfd] text-[#0c102b] border-[#808dfd]" : "bg-[#1f2756] text-blue-200 border-[#38438a] hover:bg-[#29346e]")">
+                        ★ 5 Stars
+                    </button>
+                    <button @onclick='() => SetStarFilter(4)'
+                            class="text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-md border transition-colors @(selectedRatingFilter == 4 ? "bg-[#808dfd] text-[#0c102b] border-[#808dfd]" : "bg-[#1f2756] text-blue-200 border-[#38438a] hover:bg-[#29346e]")">
+                        ★ 4 Stars
+                    </button>
+                    <button @onclick='() => SetStarFilter(3)'
+                            class="text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-md border transition-colors @(selectedRatingFilter == 3 ? "bg-[#808dfd] text-[#0c102b] border-[#808dfd]" : "bg-[#1f2756] text-blue-200 border-[#38438a] hover:bg-[#29346e]")">
+                        ★ ≤ 3 Stars
+                    </button>
+                    <button type="button" @onclick="ScrollToReviewForm"
+                            class="text-xs font-black uppercase tracking-wider px-4 py-1.5 rounded-md bg-[#808dfd] text-[#0c102b] border border-[#808dfd] transition-all hover:bg-[#939ffd] active:scale-95 cursor-pointer ml-auto sm:ml-2">
+                        + WRITE A REVIEW
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reviews Grid -->
+            @if (!FilteredReviews.Any())
+            {
+                <div class="text-center py-16 bg-[#131c54]/50 border border-[#38438a] rounded-xl mt-8">
+                    <p class="text-blue-200 text-sm">No transmissions found matching this filter.</p>
+                    <button @onclick='() => SetStarFilter(0)' class="mt-3 text-xs text-[#808dfd] underline font-bold uppercase tracking-wider bg-transparent border-none cursor-pointer">
+                        Reset Filter
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                    @foreach (var review in FilteredReviews)
+                    {
+                        <div class="bg-[#131c54] border border-[#38438a] hover:border-[#808dfd]/60 rounded-xl p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 shadow-lg">
+                            <div>
+                                <!-- Top Row: Stars and Date -->
+                                <div class="flex items-center justify-between gap-2 mb-3">
+                                    <div class="flex items-center gap-1 text-amber-400 text-sm">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= review.Rating)
+                                            {
+                                                <span>★</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-blue-900/60">★</span>
+                                            }
+                                        }
+                                    </div>
+                                    <span class="text-[11px] text-blue-300/70 font-mono">
+                                        @review.CreatedAt.ToString("MMM dd, yyyy")
+                                    </span>
+                                </div>
+
+                                <!-- Class Tag -->
+                                <div class="mb-3">
+                                    <span class="bg-[#0c102b] text-[#93c5fd] text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border border-blue-900/50 inline-block">
+                                        @review.ClassTitle
+                                    </span>
+                                </div>
+
+                                <!-- Title -->
+                                <h3 class="font-display font-black text-lg text-white m-0 mb-2 leading-snug">
+                                    @review.Title
+                                </h3>
+
+                                <!-- Comment Body -->
+                                <p class="text-[13px] text-blue-100/90 leading-relaxed m-0 mb-6 font-normal">
+                                    @review.Comment
+                                </p>
+                            </div>
+
+                            <!-- Bottom Author & Helpful Action -->
+                            <div class="border-t border-[#38438a]/60 pt-4 flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-full bg-[#202758] text-[#808dfd] border border-[#38438a] font-black flex items-center justify-center text-xs">
+                                        @GetInitials(review.AuthorName)
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-xs text-white">@review.AuthorName</div>
+                                        <div class="text-[10px] text-blue-300/80 uppercase tracking-wider">@review.ForceRank</div>
+                                    </div>
+                                </div>
+
+                                <button @onclick="() => IncrementHelpful(review)"
+                                        class="flex items-center gap-1.5 text-xs text-blue-200/80 hover:text-white bg-[#0e1644] hover:bg-[#1a2360] border border-[#38438a] rounded-md px-2.5 py-1 transition-colors cursor-pointer">
+                                    <span>👍</span>
+                                    <span class="font-mono text-[11px]">@review.HelpfulCount</span>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+        </div>
+    </section>
+
+    <!-- SECTION 4: INTERACTIVE SUBMIT RATING & COMMENT FORM -->
+    <section id="leave-review" class="w-full bg-[#150073] px-5 py-12 md:px-10 md:py-16 lg:px-[60px] lg:py-20 border-b border-[#38438a]">
+        <div class="max-w-3xl mx-auto bg-[#131c54] border border-[#38438a] rounded-2xl p-6 sm:p-10 shadow-2xl">
+
+            <div class="text-center mb-8">
+                <span class="font-black text-[10px] tracking-[0.25em] uppercase text-[#93c5fd] mb-2 block">
+                    YOUR TRANSMISSION COUNTS
+                </span>
+                <h2 class="font-display font-black text-2xl uppercase tracking-tight text-white m-0 mb-2 md:text-3xl">
+                    RATE & TRANSMIT YOUR REVIEW
+                </h2>
+                <p class="text-blue-200/80 text-xs sm:text-sm max-w-md mx-auto m-0">
+                    How was your experience on the mat? Let the Jedi High Council know how your mind, body, and Force alignment progressed.
+                </p>
+            </div>
+
+            @if (showSuccessAlert)
+            {
+                <div class="bg-green-500/15 border border-green-500/40 rounded-xl p-6 text-center mb-8 animate-in fade-in duration-300">
+                    <div class="w-12 h-12 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-2xl mx-auto mb-3">✓</div>
+                    <h3 class="font-display font-black text-xl text-white uppercase tracking-tight m-0 mb-1">
+                        Holocron Received!
+                    </h3>
+                    <p class="text-blue-100/90 text-xs m-0">
+                        Thank you, <strong class="text-white">@lastSubmittedAuthor</strong>. Your review has been recorded into the Jedi archives and is now visible above.
+                    </p>
+                </div>
+            }
+
+            <EditForm Model="@newReview" OnValidSubmit="HandleReviewSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="flex flex-col gap-6">
+
+                    <!-- Interactive Star Rating Selector -->
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-[0.12em] text-blue-200/90 mb-2">
+                            Select Rating: <span class="text-amber-400 font-extrabold">@newReview.Rating / 5 Stars</span> — <span class="text-[#93c5fd] font-normal">@GetRatingDescription(newReview.Rating)</span>
+                        </label>
+                        <div class="flex items-center gap-2">
+                            @for (int star = 1; star <= 5; star++)
+                            {
+                                int currentStar = star;
+                                <button type="button"
+                                        @onclick="() => SetRating(currentStar)"
+                                        class="text-3xl sm:text-4xl bg-transparent border-none cursor-pointer transition-transform hover:scale-125 focus:outline-none p-1 @(currentStar <= newReview.Rating ? "text-amber-400" : "text-blue-900/50 hover:text-amber-300")"
+                                        aria-label="@($"Rate {currentStar} stars")">
+                                    ★
+                                </button>
+                            }
+                        </div>
+                        <ValidationMessage For="@(() => newReview.Rating)" class="text-red-400 text-xs mt-1 block" />
+                    </div>
+
+                    <!-- Name and Force Rank -->
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-[0.12em] text-blue-200/90 mb-1">
+                                Jedi Name / Handle *
+                            </label>
+                            <InputText @bind-Value="newReview.AuthorName"
+                                       class="w-full bg-[#0d143f] border border-blue-800/80 rounded-md px-3.5 py-2.5 text-sm text-white outline-none focus:border-blue-400 transition-colors"
+                                       placeholder="e.g., Ahsoka Tano" />
+                            <ValidationMessage For="@(() => newReview.AuthorName)" class="text-red-400 text-xs mt-1 block" />
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-[0.12em] text-blue-200/90 mb-1">
+                                Force Sensitivity / Rank
+                            </label>
+                            <InputSelect @bind-Value="newReview.ForceRank"
+                                         class="w-full bg-[#0d143f] border border-blue-800/80 rounded-md px-3.5 py-2.5 text-sm text-white outline-none focus:border-blue-400 transition-colors">
+                                <option value="Youngling">Youngling (Beginner)</option>
+                                <option value="Padawan">Padawan (Intermediate)</option>
+                                <option value="Jedi Knight">Jedi Knight (Advanced)</option>
+                                <option value="Jedi Master">Jedi Master (Elite)</option>
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    <!-- Yoga Session Attended -->
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-[0.12em] text-blue-200/90 mb-1">
+                            Yoga Session or Class Attended *
+                        </label>
+                        <InputSelect @bind-Value="newReview.ClassTitle"
+                                     class="w-full bg-[#0d143f] border border-blue-800/80 rounded-md px-3.5 py-2.5 text-sm text-white outline-none focus:border-blue-400 transition-colors">
+                            <option value="Master Yoda Frog Malasana & Hip Mobility">Master Yoda Frog Malasana & Hip Mobility</option>
+                            <option value="Cobra & Upward Dog Spine Realignment">Cobra & Upward Dog Spine Realignment</option>
+                            <option value="Soresu Defensive Vinyasa Flow">Soresu Defensive Vinyasa Flow</option>
+                            <option value="Vaapad High-Intensity Power Stretch">Vaapad High-Intensity Power Stretch</option>
+                            <option value="Nautolan Aquatic Yin & Deep Restoration">Nautolan Aquatic Yin & Deep Restoration</option>
+                            <option value="Dynamic Open Gym Free Flow">Dynamic Open Gym Free Flow</option>
+                        </InputSelect>
+                    </div>
+
+                    <!-- Review Headline -->
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-[0.12em] text-blue-200/90 mb-1">
+                            Review Title / Headline *
+                        </label>
+                        <InputText @bind-Value="newReview.Title"
+                                   class="w-full bg-[#0d143f] border border-blue-800/80 rounded-md px-3.5 py-2.5 text-sm text-white outline-none focus:border-blue-400 transition-colors"
+                                   placeholder="e.g., Unlocked profound hip mobility and serenity" />
+                        <ValidationMessage For="@(() => newReview.Title)" class="text-red-400 text-xs mt-1 block" />
+                    </div>
+
+                    <!-- Review Comment -->
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-[0.12em] text-blue-200/90 mb-1">
+                            Your Comments & Experiences *
+                        </label>
+                        <InputTextArea @bind-Value="newReview.Comment"
+                                       rows="4"
+                                       class="w-full bg-[#0d143f] border border-blue-800/80 rounded-md px-3.5 py-2.5 text-sm text-white outline-none focus:border-blue-400 transition-colors"
+                                       placeholder="Share details regarding the instructor, stretching routine, breathing techniques, and how you felt afterward..." />
+                        <ValidationMessage For="@(() => newReview.Comment)" class="text-red-400 text-xs mt-1 block" />
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-[#38438a]/60">
+                        <span class="text-xs text-blue-200/70">
+                            ★ All transmissions are added directly to the Council feed.
+                        </span>
+                        <button type="submit"
+                                class="w-full sm:w-auto bg-[#808dfd] hover:bg-[#939ffd] text-[#0c102b] font-black text-xs uppercase tracking-[0.15em] py-3.5 px-8 rounded-md border-none cursor-pointer shadow-md transition-all active:scale-[0.98]">
+                            SUBMIT REVIEW
+                        </button>
+                    </div>
+
+                </div>
+            </EditForm>
+
+        </div>
+    </section>
+
+    <!-- SECTION 5: CTA BANNER -->
+    <section class="w-full bg-[#29326c] px-5 py-16 text-center flex flex-col items-center justify-center border-b border-[#38438a] md:py-20 lg:py-[100px]">
+        <span class="font-black text-[11px] tracking-[0.25em] uppercase text-[#808dfd] mb-3 block">
+            READY TO EMBARK?
+        </span>
+        <h2 class="font-display font-black leading-[1.15] tracking-tight uppercase text-white m-0 mb-7 text-[26px] md:text-[38px] lg:text-[46px]">
+            JOIN THE JEDI ORDER TODAY!
+        </h2>
+        <a href="/reserve" class="font-black text-[12px] tracking-[0.15em] uppercase bg-[#808dfd] text-[#0c102b] py-[13px] px-7 rounded-md border-none cursor-pointer shadow-[0_4px_14px_rgba(0,0,0,0.25)] transition-all hover:bg-[#939ffd] hover:shadow-[0_6px_18px_rgba(128,141,253,0.35)] active:scale-[0.97] no-underline inline-block">
+            RESERVE YOUR SPOT
+        </a>
+    </section>
+
+    <!-- SECTION 6: FOOTER -->
+    <footer class="w-full bg-[#29326c] px-6 py-12 md:px-10 md:py-[60px] lg:px-[60px] lg:py-[72px]">
+        <div class="font-display font-black leading-none tracking-[-0.04em] uppercase text-[#161c3e] mb-10 select-none text-[40px] md:text-[64px] lg:text-[80px]">
+            Master Yoga
+        </div>
+
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10">
+            <div class="flex flex-col">
+                <h4 class="font-display font-black text-[13px] tracking-[0.15em] uppercase text-white m-0 mb-3.5">CONTACT</h4>
+                <p class="text-[12px] leading-[1.7] text-blue-200/85 m-0">
+                    Email: <a href="mailto:yoga@jedicouncil.com" class="text-blue-200/85 no-underline transition-colors hover:text-white">yoga@jedicouncil.com</a>
+                </p>
+                <p class="text-[12px] leading-[1.7] text-blue-200/85 m-0">
+                    Phone: <a href="tel:2035555555" class="text-blue-200/85 no-underline transition-colors hover:text-white">(203) 555-5555</a>
+                </p>
+            </div>
+
+            <div class="flex flex-col">
+                <h4 class="font-display font-black text-[13px] tracking-[0.15em] uppercase text-white m-0 mb-3.5">OPENING HOURS</h4>
+                <div class="flex flex-col gap-1 max-w-[220px]">
+                    <div class="flex justify-between text-[12px] leading-[1.6] text-blue-200/85"><span>MON – FRI</span><span>5:00 – 23:00</span></div>
+                    <div class="flex justify-between text-[12px] leading-[1.6] text-blue-200/85"><span>SATURDAYS</span><span>6:00 – 16:00</span></div>
+                    <div class="flex justify-between text-[12px] leading-[1.6] text-blue-200/85"><span>SUNDAYS</span><span>6:00 – 13:00</span></div>
+                    <div class="flex justify-between text-[12px] leading-[1.6] text-blue-200/85"><span>HOLIDAYS</span><span>8:00 – 16:00</span></div>
+                </div>
+            </div>
+
+            <div class="flex flex-col">
+                <h4 class="font-display font-black text-[13px] tracking-[0.15em] uppercase text-white m-0 mb-3.5">SOCIAL</h4>
+                <div class="flex flex-col gap-1.5">
+                    <a href="https://instagram.com" target="_blank" class="text-[12px] leading-[1.7] text-blue-200/85 no-underline transition-colors hover:text-white">Instagram</a>
+                    <a href="https://x.com" target="_blank" class="text-[12px] leading-[1.7] text-blue-200/85 no-underline transition-colors hover:text-white">X</a>
+                    <a href="https://linkedin.com" target="_blank" class="text-[12px] leading-[1.7] text-blue-200/85 no-underline transition-colors hover:text-white">LinkedIn</a>
+                    <a href="https://spotify.com" target="_blank" class="text-[12px] leading-[1.7] text-blue-200/85 no-underline transition-colors hover:text-white">Spotify</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+@code {
+    private ReviewModel newReview = new();
+    private bool showSuccessAlert = false;
+    private string lastSubmittedAuthor = "";
+    private int selectedRatingFilter = 0;
+
+    private List<ReviewModel> reviews = new()
+    {
+        new ReviewModel
+        {
+            Id = Guid.NewGuid(),
+            AuthorName = "Ahsoka Tano",
+            ForceRank = "Jedi Knight",
+            ClassTitle = "Soresu Defensive Vinyasa Flow",
+            Rating = 5,
+            Title = "Unrivaled agility and mental clarity",
+            Comment = "Master Obi-Wan's instruction in Soresu defensive transitions helped me balance dual-blade stability with deep, fluid breathing. Highly recommended for padawans striving for kinetic harmony.",
+            CreatedAt = DateTime.Now.AddDays(-2),
+            HelpfulCount = 14
+        },
+        new ReviewModel
+        {
+            Id = Guid.NewGuid(),
+            AuthorName = "Mace Windu",
+            ForceRank = "Jedi Master",
+            ClassTitle = "Vaapad High-Intensity Power Stretch",
+            Rating = 5,
+            Title = "Transmutes physical fatigue into inner discipline",
+            Comment = "Vaapad is not for the faint-hearted. It demands total surrender of tension and precise channeling of willpower into hamstring and hip flexibility. Exceptional program.",
+            CreatedAt = DateTime.Now.AddDays(-5),
+            HelpfulCount = 22
+        },
+        new ReviewModel
+        {
+            Id = Guid.NewGuid(),
+            AuthorName = "Caleb Dume",
+            ForceRank = "Padawan",
+            ClassTitle = "Cobra & Upward Dog Spine Realignment",
+            Rating = 4,
+            Title = "Superb spine release after heavy acrobatics",
+            Comment = "The upward dog cues completely relieved my thoracic compression. Master Yoda taught us how to breathe down through the palms into the earth. Will return every week.",
+            CreatedAt = DateTime.Now.AddDays(-8),
+            HelpfulCount = 9
+        },
+        new ReviewModel
+        {
+            Id = Guid.NewGuid(),
+            AuthorName = "Kit Fisto",
+            ForceRank = "Jedi Master",
+            ClassTitle = "Nautolan Aquatic Yin & Deep Restoration",
+            Rating = 5,
+            Title = "Sublime myofascial decompression",
+            Comment = "The 5-minute yin holds allowed deep tissue regeneration that ordinary meditation alone couldn't achieve. Calmed my entire nervous system.",
+            CreatedAt = DateTime.Now.AddDays(-12),
+            HelpfulCount = 18
+        },
+        new ReviewModel
+        {
+            Id = Guid.NewGuid(),
+            AuthorName = "Grogu",
+            ForceRank = "Youngling",
+            ClassTitle = "Master Yoda Frog Malasana & Hip Mobility",
+            Rating = 5,
+            Title = "Patu! The frog squat is the way.",
+            Comment = "Squatting low, feeling the floor, reaching for macarons with both hands. Master Yoda's posture is natural and deeply restorative.",
+            CreatedAt = DateTime.Now.AddDays(-15),
+            HelpfulCount = 37
+        },
+        new ReviewModel
+        {
+            Id = Guid.NewGuid(),
+            AuthorName = "Barris Offee",
+            ForceRank = "Padawan",
+            ClassTitle = "Dynamic Open Gym Free Flow",
+            Rating = 4,
+            Title = "Top-tier equipment and peaceful ambience",
+            Comment = "Spacious mats, ideal temperatures, and ambient singing bowls make this the best sanctuary in the galaxy to practice independent asanas.",
+            CreatedAt = DateTime.Now.AddDays(-19),
+            HelpfulCount = 7
+        }
+    };
+
+    private double AverageRating => reviews.Count > 0 ? reviews.Average(r => r.Rating) : 5.0;
+
+    private IEnumerable<ReviewModel> FilteredReviews
+    {
+        get
+        {
+            if (selectedRatingFilter == 0) return reviews.OrderByDescending(r => r.CreatedAt);
+            if (selectedRatingFilter <= 3) return reviews.Where(r => r.Rating <= 3).OrderByDescending(r => r.CreatedAt);
+            return reviews.Where(r => r.Rating == selectedRatingFilter).OrderByDescending(r => r.CreatedAt);
+        }
+    }
+
+    private void SetRating(int rating)
+    {
+        newReview.Rating = rating;
+    }
+
+    private void SetStarFilter(int star)
+    {
+        selectedRatingFilter = star;
+    }
+
+    private void IncrementHelpful(ReviewModel review)
+    {
+        review.HelpfulCount++;
+    }
+
+    private void HandleReviewSubmit()
+    {
+        lastSubmittedAuthor = newReview.AuthorName;
+        newReview.Id = Guid.NewGuid();
+        newReview.CreatedAt = DateTime.Now;
+        newReview.HelpfulCount = 0;
+
+        // Insert at the top of the reviews list
+        reviews.Insert(0, newReview);
+
+        // Reset the form model
+        newReview = new ReviewModel();
+        showSuccessAlert = true;
+    }
+
+    private async Task ScrollToReviewForm()
+    {
+        await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('leave-review')?.scrollIntoView({ behavior: 'smooth' })");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("eval", "if (window.location.hash === '#leave-review') { setTimeout(() => document.getElementById('leave-review')?.scrollIntoView({ behavior: 'smooth' }), 200); }");
+        }
+    }
+
+    private string GetRatingDescription(int rating) => rating switch
+    {
+        5 => "Mastery & Enlightenment (Outstanding)",
+        4 => "Strong with the Force (Very Good)",
+        3 => "Balanced Path (Good)",
+        2 => "Meditation Needed (Fair)",
+        1 => "Disturbance in the Force (Needs Improvement)",
+        _ => "Select rating"
+    };
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "J";
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1) return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
+        return $"{parts[0][0]}{parts[parts.Length - 1][0]}".ToUpper();
+    }
+}

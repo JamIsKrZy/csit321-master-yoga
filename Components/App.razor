@@ -31,6 +31,11 @@
 
 <body>
     <Routes />
+    <script>
+        if (window.location.hash === '#leave-review' && (window.location.pathname === '/' || window.location.pathname === '')) {
+            window.location.replace('/reviews#leave-review');
+        }
+    </script>
     <script src="_framework/blazor.web.js"></script>
 </body>
 
